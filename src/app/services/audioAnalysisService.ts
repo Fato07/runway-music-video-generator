@@ -27,10 +27,10 @@ function executePythonScript(command: string): Promise<string> {
 export function detectBeats(filePath: string): Promise<number[]> {
   return executePythonScript(`/Users/fathindosunmu/DEV/MyProjects/runway-music-video-generator/python-scripts/.venv/bin/python python-scripts/audio_analysis.py beats ${filePath}`)
     .then(result => {
-      if (Array.isArray(result)) {
-        return result.map(Number);
+      if (result && Array.isArray(result.beats)) {
+        return result.beats.map(Number);
       }
-      throw new Error('Unexpected result format');
+      throw new Error('Unexpected result format for beats');
     });
 }
 /**
@@ -41,11 +41,10 @@ export function detectBeats(filePath: string): Promise<number[]> {
 export function analyzeTempo(filePath: string): Promise<number> {
   return executePythonScript(`/Users/fathindosunmu/DEV/MyProjects/runway-music-video-generator/python-scripts/.venv/bin/python python-scripts/audio_analysis.py tempo ${filePath}`)
     .then(result => {
-      const tempo = Number(result);
-      if (isNaN(tempo)) {
-        throw new Error('Invalid tempo value');
+      if (result && typeof result.tempo === 'number') {
+        return result.tempo;
       }
-      return tempo;
+      throw new Error('Unexpected result format for tempo');
     });
 }
 
