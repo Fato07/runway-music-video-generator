@@ -2,7 +2,7 @@ import { detectBeats, analyzeTempo, extractMood } from '../services/audioAnalysi
 import path from 'path';
 
 describe('audioAnalysisService', () => {
-  const sampleAudioPath = path.resolve(__dirname, 'samples', 'sample.mp3');
+  const sampleAudioPath = path.resolve(__dirname, 'samples', 'sample.wav');
   const invalidAudioPath = path.resolve(__dirname, 'samples', 'invalid.txt');
   const sampleText = "I am feeling very happy today!";
 
