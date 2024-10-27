@@ -42,6 +42,6 @@ if __name__ == "__main__":
         import json
         print(json.dumps(tempo))
     elif command == "mood":
-        text = sys.argv[2]  # Corrected index
+        text = sys.argv[2]
         mood = extract_mood(text)
         print(mood)
