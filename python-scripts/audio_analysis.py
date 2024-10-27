@@ -1,6 +1,10 @@
 import sys
+import warnings
 import librosa
 from textblob import TextBlob
+
+# Suppress librosa warnings
+warnings.filterwarnings("ignore", category=UserWarning, module='librosa')
 
 def detect_beats(file_path):
     try:

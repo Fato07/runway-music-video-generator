@@ -4,8 +4,8 @@ import { exec } from 'child_process';
 function executePythonScript(command: string): Promise<string> {
   return new Promise((resolve, reject) => {
     exec(command, (error, stdout, stderr) => {
-      console.log(`stdout: ${stdout}`);
-      console.error(`stderr: ${stderr}`);
+      // console.log(`stdout: ${stdout}`);
+      // console.error(`stderr: ${stderr}`);
       if (error) {
         reject(new Error(stderr.trim()));
       } else {
