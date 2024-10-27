@@ -3,14 +3,23 @@ import librosa
 from textblob import TextBlob
 
 def detect_beats(file_path):
-    y, sr = librosa.load(file_path)
-    tempo, beats = librosa.beat.beat_track(y=y, sr=sr)
-    return beats.tolist()
+    try:
+        y, sr = librosa.load(file_path)
+        tempo, beats = librosa.beat.beat_track(y=y, sr=sr)
+        return beats.tolist()
+    except Exception as e:
+        print(f"Error loading file: {e}")
+        return []
 
 def analyze_tempo(file_path):
-    y, sr = librosa.load(file_path)
-    tempo, _ = librosa.beat.beat_track(y=y, sr=sr)
-    return tempo
+    try:
+        y, sr = librosa.load(file_path)
+        tempo, _ = librosa.beat.beat_track(y=y, sr=sr)
+        return tempo
+    except Exception as e:
+        print(f"Error loading file: {e}")
+        return 0
+
 
 def extract_mood(text):
     analysis = TextBlob(text)
