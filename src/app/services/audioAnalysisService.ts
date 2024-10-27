@@ -25,7 +25,7 @@ function executePythonScript(command: string): Promise<string> {
  * @returns {Promise<number[]>} - A promise that resolves to an array of beat times.
  */
 export function detectBeats(filePath: string): Promise<number[]> {
-  return executePythonScript(`python python-scripts/audio_analysis.py beats ${filePath}`)
+  return executePythonScript(`/Users/fathindosunmu/DEV/MyProjects/runway-music-video-generator/python-scripts/.venv/bin/python python-scripts/audio_analysis.py beats ${filePath}`)
     .then(result => {
       if (Array.isArray(result)) {
         return result.map(Number);
@@ -39,7 +39,7 @@ export function detectBeats(filePath: string): Promise<number[]> {
  * @returns {Promise<number>} - A promise that resolves to the tempo in beats per minute (BPM).
  */
 export function analyzeTempo(filePath: string): Promise<number> {
-  return executePythonScript(`python3 python-scripts/audio_analysis.py tempo ${filePath}`)
+  return executePythonScript(`/Users/fathindosunmu/DEV/MyProjects/runway-music-video-generator/python-scripts/.venv/bin/python python-scripts/audio_analysis.py tempo ${filePath}`)
     .then(result => {
       const tempo = Number(result);
       if (isNaN(tempo)) {
@@ -64,7 +64,7 @@ export function extractMood(text: string): Promise<number> {
       if (error) {
         reject(error);
       } else {
-        resolve(parseFloat(stdout));
+        resolve(parseFloat(stdout.trim()));
       }
     });
   });
