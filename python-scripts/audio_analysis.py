@@ -27,6 +27,6 @@ if __name__ == "__main__":
         tempo = analyze_tempo(file_path)
         print(tempo)
     elif command == "mood":
-        text = sys.argv[3]
+        text = sys.argv[2]  # Corrected index
         mood = extract_mood(text)
         print(mood)

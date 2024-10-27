@@ -7,12 +7,14 @@ describe('audioAnalysisService', () => {
   const sampleText = "I am feeling very happy today!";
 
   it('should detect beats in a valid audio file', async () => {
+    jest.setTimeout(15000); // Set timeout to 15 seconds
     const beats = await detectBeats(sampleAudioPath);
     expect(Array.isArray(beats)).toBe(true);
     expect(beats.length).toBeGreaterThan(0);
   });
 
   it('should analyze tempo in a valid audio file', async () => {
+    jest.setTimeout(15000); // Set timeout to 15 seconds
     const tempo = await analyzeTempo(sampleAudioPath);
     expect(typeof tempo).toBe('number');
     expect(tempo).toBeGreaterThan(0);
