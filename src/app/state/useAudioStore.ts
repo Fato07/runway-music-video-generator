@@ -12,7 +12,8 @@ const useAudioStore = create<AudioState>((set) => ({
   setAudioFile: (file) => set({ audioFile: file }),
   clearAudioFile: () => set({ audioFile: null }),
   getAudioFile: () => {
-    return (get) => get().audioFile;
+    const state = useAudioStore.getState();
+    return state.audioFile;
   },
 }));
 
