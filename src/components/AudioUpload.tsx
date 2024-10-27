@@ -40,7 +40,7 @@ const AudioUpload: React.FC<AudioUploadProps> = ({ onFileSelect }) => {
         textAlign: 'center',
       }}
     >
-      <input type="file" accept=".mp3, .wav" onChange={handleFileSelect} />
+      <input type="file" accept=".mp3, .wav" onChange={handleFileSelect} aria-label="select a file" />
       <p>Drag and drop an audio file here, or click to select a file.</p>
       {error && <p style={{ color: 'red' }}>{error}</p>}
     </div>
