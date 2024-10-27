@@ -11,10 +11,12 @@ const useAudioStore = create<AudioState>((set) => ({
   audioFile: null,
   setAudioFile: (file) => set({ audioFile: file }),
   clearAudioFile: () => set({ audioFile: null }),
-  getAudioFile: () => {
-    const state = useAudioStore.getState();
-    return state.audioFile;
-  },
+  getAudioFile: () => getAudioFileFromState(),
 }));
+
+function getAudioFileFromState(): File | null {
+  const state = useAudioStore.getState();
+  return state.audioFile;
+}
 
 export default useAudioStore;
