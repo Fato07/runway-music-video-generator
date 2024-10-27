@@ -1,36 +1,52 @@
-import { parseFile } from 'music-metadata';
-import { readFileSync } from 'fs';
-import { parse } from 'node-wav';
+import { exec } from 'child_process';
 
 /**
- * Analyzes the audio file to detect beats.
+ * Detects beats in an audio file using a Python script.
  * @param {string} filePath - The path to the audio file.
  * @returns {Promise<number[]>} - A promise that resolves to an array of beat times.
  */
-export async function detectBeats(filePath: string): Promise<number[]> {
-  // Placeholder implementation
-  // You would need to use a Python script or a more advanced library for real beat detection
-  return [];
+export function detectBeats(filePath: string): Promise<number[]> {
+  return new Promise((resolve, reject) => {
+    exec(`python3 python-scripts/audio_analysis.py beats ${filePath}`, (error, stdout, stderr) => {
+      if (error) {
+        reject(error);
+      } else {
+        resolve(JSON.parse(stdout));
+      }
+    });
+  });
 }
 
 /**
- * Analyzes the audio file to determine the tempo.
+ * Analyzes the tempo of an audio file using a Python script.
  * @param {string} filePath - The path to the audio file.
  * @returns {Promise<number>} - A promise that resolves to the tempo in beats per minute (BPM).
  */
-export async function analyzeTempo(filePath: string): Promise<number> {
-  const metadata = await parseFile(filePath);
-  // Placeholder: Use metadata or another method to estimate tempo
-  return metadata.format.bitrate ? metadata.format.bitrate / 1000 : 120; // Example: return a default tempo
+export function analyzeTempo(filePath: string): Promise<number> {
+  return new Promise((resolve, reject) => {
+    exec(`python3 python-scripts/audio_analysis.py tempo ${filePath}`, (error, stdout, stderr) => {
+      if (error) {
+        reject(error);
+      } else {
+        resolve(parseFloat(stdout));
+      }
+    });
+  });
 }
 
 /**
- * Extracts the mood of the audio file.
- * @param {string} filePath - The path to the audio file.
- * @returns {Promise<string>} - A promise that resolves to a string representing the mood.
+ * Extracts the mood from a text using a Python script.
+ * @param {string} text - The text to analyze.
+ * @returns {Promise<number>} - A promise that resolves to a mood score.
  */
-export async function extractMood(filePath: string): Promise<string> {
-  // Placeholder implementation
-  // Mood extraction would typically require machine learning models
-  return 'neutral';
+export function extractMood(text: string): Promise<number> {
+  return new Promise((resolve, reject) => {
+    exec(`python3 python-scripts/audio_analysis.py mood "${text}"`, (error, stdout, stderr) => {
+      if (error) {
+        reject(error);
+      } else {
+        resolve(parseFloat(stdout));
+      }
+    });
+  });
 }
