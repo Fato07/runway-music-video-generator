@@ -84,13 +84,15 @@ export default function Home() {
             setSceneDescription(description);
             setCurrentStep('generating-image');
 
-            // Generate image with mood context
+            // Generate image with enhanced context
             const imageUrl = await generateSceneImages(
                 description,
                 {
-                    quality: "high",
+                    quality: "hd",
                     resolution: "1024x1024",
-                    theme: moodPatterns.dominantMood
+                    theme: moodPatterns.dominantMood,
+                    tempo: results.tempo,
+                    moodTransitions: moodPatterns.transitions
                 }
             );
 

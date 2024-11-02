@@ -1,7 +1,9 @@
 export interface GenerateSceneImageOptions {
-    quality: string;
-    resolution: string;
+    quality: 'standard' | 'hd';
+    resolution: '1024x1024' | '1792x1024' | '1024x1792';
     theme: string;
+    tempo?: number;
+    moodTransitions?: Array<{from: string, to: string, time: number}>;
 }
 
 interface DalleResponse {
@@ -14,13 +16,58 @@ interface DalleResponse {
 const OPENAI_API_KEY = process.env.OPENAI_API_KEY;
 
 /**
- * Generates scene images using DALL-E or Stable Diffusion based on the provided scene description.
- * @param {string} sceneDescription - The description of the scene to generate images for.
- * @param {GenerateSceneImageOptions} options - Options for adjusting image quality, resolution, and theme.
- * @returns {Promise<string[]>} - A promise that resolves to an array of image URLs.
+ * Creates an enhanced prompt that incorporates musical characteristics
  */
-export async function generateSceneImages(sceneDescription: string, options?: GenerateSceneImageOptions): Promise<string> {
+function createEnhancedPrompt(
+    baseDescription: string, 
+    options: GenerateSceneImageOptions
+): string {
+    const tempoDescription = options.tempo 
+        ? options.tempo > 120 ? "dynamic and energetic"
+        : options.tempo > 90 ? "balanced and flowing"
+        : "calm and measured"
+        : "";
+
+    const moodStyle = options.theme === 'energetic'
+        ? 'vibrant colors, dynamic composition, strong contrast'
+        : 'soft colors, gentle transitions, subtle harmony';
+
+    const transitionsDescription = options.moodTransitions?.length
+        ? `The scene should smoothly transition between moods: ${
+            options.moodTransitions
+                .map(t => `from ${t.from} to ${t.to}`)
+                .join(', ')
+          }`
+        : '';
+
+    return `Create a visually striking scene with ${moodStyle}. 
+    The overall mood is ${options.theme}, with a ${tempoDescription} atmosphere.
+    ${transitionsDescription}
+    
+    Scene details: ${baseDescription}
+    
+    Important artistic elements:
+    - Use color palette that reflects the ${options.theme} mood
+    - Create visual flow that matches the musical rhythm
+    - Include subtle visual metaphors for mood transitions
+    - Maintain surrealist artistic style
+    - Ensure high visual coherence and professional quality`;
+}
+
+/**
+ * Generates scene images using DALL-E based on the provided scene description and musical characteristics.
+ * @param {string} sceneDescription - The description of the scene to generate images for.
+ * @param {GenerateSceneImageOptions} options - Options for adjusting quality, resolution, and musical context.
+ * @returns {Promise<string>} - A promise that resolves to the generated image URL.
+ */
+export async function generateSceneImages(
+    sceneDescription: string,
+    options: GenerateSceneImageOptions
+): Promise<string> {
     try {
+        const enhancedPrompt = createEnhancedPrompt(sceneDescription, options);
+        console.log('Enhanced prompt:', enhancedPrompt); // For debugging
+
         const response = await fetch('https://api.openai.com/v1/images/generations', {
             method: 'POST',
             headers: {
@@ -29,9 +76,11 @@ export async function generateSceneImages(sceneDescription: string, options?: Ge
             },
             body: JSON.stringify({
                 model: "dall-e-3",
-                prompt: sceneDescription,
+                prompt: enhancedPrompt,
                 n: 1,
-                size: "1024x1024",
+                size: options.resolution,
+                quality: options.quality,
+                style: "vivid",
             }),
         });
 
