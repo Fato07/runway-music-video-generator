@@ -16,7 +16,6 @@ interface AnalysisResults {
     beats: number[];
     segments: Segment[];
     tempo: number;
-    variations?: string[];
 }
 
 // Add the analyzeMoodPatterns helper function
@@ -54,6 +53,7 @@ export default function Home() {
     const [analysisResults, setAnalysisResults] = useState<AnalysisResults | null>(null);
     const [sceneDescription, setSceneDescription] = useState<string | null>(null);
     const [generatedImage, setGeneratedImage] = useState<string | null>(null);
+    const [imageVariations, setImageVariations] = useState<string[] | null>(null);
     const [isGenerating, setIsGenerating] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const [currentStep, setCurrentStep] = useState<string>('waiting'); // 'waiting' | 'analyzing' | 'generating-description' | 'generating-image'
@@ -86,7 +86,7 @@ export default function Home() {
             setCurrentStep('generating-image');
 
             // Generate image with enhanced context
-            const { imageUrl, prompt: imagePrompt } = await generateSceneImages(
+            const { imageUrl, prompt: imagePrompt, variations } = await generateSceneImages(
                 description,
                 {
                     quality: "hd",
@@ -98,6 +98,7 @@ export default function Home() {
             );
 
             setGeneratedImage(imageUrl);
+            setImageVariations(variations);
             setCurrentStep('complete');
 
             // Log the results with the original filename through the API
@@ -179,7 +180,7 @@ export default function Home() {
                             
                             {/* Image Variations */}
                             <div className="grid grid-cols-2 gap-4 max-w-2xl mx-auto">
-                                {analysisResults?.variations?.map((variationUrl, index) => (
+                                {imageVariations?.map((variationUrl, index) => (
                                     <div key={index} className="relative group">
                                         <img 
                                             src={variationUrl}
