@@ -98,7 +98,7 @@ export default function Home() {
             );
 
             setGeneratedImage(imageUrl);
-            setImageVariations(variations);
+            setImageVariations(variations || null);
             setCurrentStep('complete');
 
             // Log the results with the original filename through the API
@@ -129,7 +129,6 @@ export default function Home() {
             setIsGenerating(false);
         }
     };
-
     return (
         <div className="min-h-screen bg-background">
             <main className="container mx-auto px-4 py-8">
