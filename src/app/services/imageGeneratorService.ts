@@ -1,12 +1,8 @@
-import 'openai/shims/node';
 import OpenAI from "openai";
 
-const openai = new OpenAI(
-    {
-        organization: process.env.OPENAI_ORGANISATION_ID,
-        apiKey: process.env.OPENAI_API_KEY,
-    }
-);
+const openai = new OpenAI({
+    apiKey: process.env.OPENAI_API_KEY,
+});
 
  export interface GenerateSceneImageOptions {
      quality: string;
