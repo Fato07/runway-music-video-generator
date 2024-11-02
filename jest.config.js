@@ -1,10 +1,14 @@
-/**
- * For a detailed explanation regarding each configuration property, visit:
- * https://jestjs.io/docs/configuration
- */
-
-/** @type {import('jest').Config} */
-const config = {
+module.exports = {
+  presets: ['next/babel'],
+  env: {
+    test: {
+      presets: [
+        ['@babel/preset-env', { targets: { node: 'current' } }],
+        '@babel/preset-typescript',
+        ['@babel/preset-react', { runtime: 'automatic' }]
+      ]
+    }
+  }
   // All imported modules in your tests should be mocked automatically
   // automock: false,
 

@@ -1,7 +1,6 @@
 'use client';
 
 import { useState } from "react";
-import styles from "./page.module.css";
 import AudioUpload from "@/components/AudioUpload";
 import { generateSceneImage } from "./services/imageGeneratorService";
 
@@ -53,8 +52,8 @@ export default function Home() {
   };
 
   return (
-    <div className={styles.page}>
-      <main className={styles.main}>
+    <div className="min-h-screen bg-background">
+      <main className="container mx-auto px-4 py-8">
         <AudioUpload onAnalysisComplete={handleAnalysisComplete} />
         
         {error && (
