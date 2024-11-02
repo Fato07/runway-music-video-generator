@@ -57,6 +57,8 @@ export default function Home() {
     const [isGenerating, setIsGenerating] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const [currentStep, setCurrentStep] = useState<string>('waiting'); // 'waiting' | 'analyzing' | 'generating-description' | 'generating-image'
+    const [videoUrl, setVideoUrl] = useState<string | null>(null);
+    const [isGeneratingVideo, setIsGeneratingVideo] = useState(false);
 
     const handleAnalysisComplete = async (results: AnalysisResults, fileName: string) => {
         setAnalysisResults(results);
