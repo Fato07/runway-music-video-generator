@@ -92,12 +92,12 @@ def analyze():
             print("No file in request")
             return jsonify({'error': 'No file provided'}), 400
         
-    file = request.files['file']
-    if file.filename == '':
-        print("Empty filename")
-        return jsonify({'error': 'No file selected'}), 400
-        
-    if file:
+        file = request.files['file']
+        if file.filename == '':
+            print("Empty filename")
+            return jsonify({'error': 'No file selected'}), 400
+            
+        if file:
         filename = secure_filename(file.filename)
         filepath = os.path.join(UPLOAD_FOLDER, filename)
         try:
