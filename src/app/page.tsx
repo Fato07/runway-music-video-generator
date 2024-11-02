@@ -164,14 +164,32 @@ export default function Home() {
 
                 {generatedImage && (
                     <div className="mt-8">
-                        <div className="relative group max-w-2xl mx-auto">
-                            <img 
-                                src={generatedImage}
-                                alt="Generated scene visualization"
-                                className="w-full rounded-lg shadow-lg transition-transform duration-200 group-hover:scale-[1.02]"
-                            />
-                            <div className="absolute bottom-4 right-4 bg-black bg-opacity-50 text-white px-4 py-2 rounded-full text-sm">
-                                Generated Scene
+                        <div className="space-y-8">
+                            <div className="relative group max-w-2xl mx-auto">
+                                <img 
+                                    src={generatedImage}
+                                    alt="Generated scene visualization"
+                                    className="w-full rounded-lg shadow-lg transition-transform duration-200 group-hover:scale-[1.02]"
+                                />
+                                <div className="absolute bottom-4 right-4 bg-black bg-opacity-50 text-white px-4 py-2 rounded-full text-sm">
+                                    Original Scene
+                                </div>
+                            </div>
+                            
+                            {/* Image Variations */}
+                            <div className="grid grid-cols-2 gap-4 max-w-2xl mx-auto">
+                                {analysisResults?.variations?.map((variationUrl, index) => (
+                                    <div key={index} className="relative group">
+                                        <img 
+                                            src={variationUrl}
+                                            alt={`Scene variation ${index + 1}`}
+                                            className="w-full rounded-lg shadow-lg transition-transform duration-200 group-hover:scale-[1.02]"
+                                        />
+                                        <div className="absolute bottom-4 right-4 bg-black bg-opacity-50 text-white px-4 py-2 rounded-full text-sm">
+                                            Variation {index + 1}
+                                        </div>
+                                    </div>
+                                ))}
                             </div>
                         </div>
                         

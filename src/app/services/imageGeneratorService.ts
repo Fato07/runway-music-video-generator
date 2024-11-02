@@ -6,6 +6,50 @@ export interface GenerateSceneImageOptions {
     moodTransitions?: Array<{from: string, to: string, time: number}>;
 }
 
+/**
+ * Generates variations of an image using DALL-E
+ * @param {string} imageUrl - The URL of the original image
+ * @returns {Promise<string[]>} - Array of variation image URLs
+ */
+async function generateImageVariations(imageUrl: string): Promise<string[]> {
+    try {
+        // Download the image first
+        const imageResponse = await fetch(imageUrl);
+        const imageBuffer = Buffer.from(await imageResponse.arrayBuffer());
+
+        // Create form data with the image
+        const formData = new FormData();
+        formData.append('image', new Blob([imageBuffer], { type: 'image/png' }));
+        formData.append('n', '4');
+        formData.append('size', '1024x1024');
+
+        // Make the variations request
+        const response = await fetch('https://api.openai.com/v1/images/variations', {
+            method: 'POST',
+            headers: {
+                'Authorization': `Bearer ${OPENAI_API_KEY}`,
+            },
+            body: formData
+        });
+
+        if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(`OpenAI API Error: ${response.status} - ${JSON.stringify(errorData)}`);
+        }
+
+        const data: DalleResponse = await response.json();
+        
+        if (!data.data || data.data.length === 0) {
+            throw new Error('No variations returned from the API');
+        }
+
+        return data.data.map(image => image.url);
+    } catch (error) {
+        console.error('Error generating image variations:', error);
+        throw error;
+    }
+}
+
 interface DalleResponse {
     created: number;
     data: Array<{
@@ -63,7 +107,7 @@ function createEnhancedPrompt(
 export async function generateSceneImages(
     sceneDescription: string,
     options: GenerateSceneImageOptions
-): Promise<{ imageUrl: string; prompt: string }> {
+): Promise<{ imageUrl: string; prompt: string; variations?: string[] }> {
     try {
         const enhancedPrompt = createEnhancedPrompt(sceneDescription, options);
         console.log('Enhanced prompt:', enhancedPrompt); // For debugging
@@ -95,9 +139,15 @@ export async function generateSceneImages(
             throw new Error('No images returned from the API');
         }
 
+        const imageUrl = data.data[0].url;
+        
+        // Generate variations
+        const variations = await generateImageVariations(imageUrl);
+
         return {
-            imageUrl: data.data[0].url,
-            prompt: enhancedPrompt
+            imageUrl,
+            prompt: enhancedPrompt,
+            variations
         };
     } catch (error) {
         console.error('Error generating scene images:', error);

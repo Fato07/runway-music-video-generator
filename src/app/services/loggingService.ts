@@ -22,6 +22,7 @@ interface AnalysisLog {
     sceneDescription: string;
     imagePrompt: string;
     imageUrl: string;
+    variations?: string[];
 }
 
 export async function logResults(log: AnalysisLog): Promise<void> {
@@ -66,6 +67,21 @@ export async function logResults(log: AnalysisLog): Promise<void> {
             path.join(analysisDir, 'generated-image.png'),
             imageBuffer
         );
+
+        // Download and save variations if they exist
+        if (log.variations) {
+            const variationsDir = path.join(analysisDir, 'variations');
+            await mkdir(variationsDir, { recursive: true });
+
+            await Promise.all(log.variations.map(async (variationUrl, index) => {
+                const variationResponse = await fetch(variationUrl);
+                const variationBuffer = Buffer.from(await variationResponse.arrayBuffer());
+                await writeFile(
+                    path.join(variationsDir, `variation-${index + 1}.png`),
+                    variationBuffer
+                );
+            }));
+        }
 
         console.log(`Results saved to: ${analysisDir}`);
     } catch (error) {
