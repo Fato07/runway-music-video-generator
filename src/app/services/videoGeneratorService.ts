@@ -47,11 +47,10 @@ export async function generateVideo(
         // Generate video from main image
         const mainVideoTask = await client.imageToVideo.create({
             model: 'gen3a_turbo',
+            duration: 10,
             promptImage: mainImage,
             promptText: createVideoPrompt(options),
-            mode: 'standard', // or 'movie' for longer sequences
-            numFrames: Math.min(120, Math.floor(options.duration * 30)), // 30fps, max 4 seconds for standard mode
-            numOutputs: 1
+            watermark: false
         });
 
         // Poll for completion
@@ -59,7 +58,7 @@ export async function generateVideo(
         do {
             await new Promise(resolve => setTimeout(resolve, 2000)); // Poll every 2 seconds
             task = await client.tasks.retrieve(mainVideoTask.id);
-        } while (task.status === 'PROCESSING');
+        } while (task.status === 'RUNNING');
 
         if (task.status === 'FAILED') {
             throw new Error(`Video generation failed: ${task.failure || task.failureCode}`);
