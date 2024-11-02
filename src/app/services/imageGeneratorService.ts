@@ -14,8 +14,12 @@ export interface GenerateSceneImageOptions {
 async function generateImageVariations(imageUrl: string): Promise<string[]> {
     try {
         // Download the image first
-        const imageResponse = await fetch(imageUrl);
-        const imageBuffer = Buffer.from(await imageResponse.arrayBuffer());
+        const proxyUrl = `/api/proxy-image?url=${encodeURIComponent(imageUrl)}`;
+        const imageResponse = await fetch(proxyUrl);
+        if (!imageResponse.ok) {
+            throw new Error(`Failed to fetch image through proxy: ${imageResponse.status}`);
+        }
+        const imageBuffer = await imageResponse.arrayBuffer();
 
         // Create form data with the image
         const formData = new FormData();
