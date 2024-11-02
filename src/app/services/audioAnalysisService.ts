@@ -108,16 +108,27 @@ interface AudioAnalysisResult {
 
 export async function analyzeAudio(audioUrl: string): Promise<AudioAnalysisResult> {
   try {
-    // TODO: Implement actual audio analysis
-    // This is a mock implementation until we properly integrate with Python
+    const formData = new FormData();
+    const response = await fetch(audioUrl);
+    const blob = await response.blob();
+    formData.append('file', blob);
+
+    const analysisResponse = await fetch('http://localhost:5001/analyze', {
+      method: 'POST',
+      body: formData,
+    });
+
+    if (!analysisResponse.ok) {
+      throw new Error('Failed to analyze audio');
+    }
+
+    const results = await analysisResponse.json();
+    
     return {
-      beats: [1, 2, 3, 4],
-      tempo: 120,
-      mood: "energetic",
-      segments: [
-        { start: 0, end: 30, description: "Upbeat intro section" },
-        { start: 31, end: 60, description: "Melodic bridge section" }
-      ]
+      beats: results.beats,
+      tempo: results.tempo,
+      mood: results.segments[0]?.mood || 'neutral', // Use first segment's mood as overall mood
+      segments: results.segments
     };
   } catch (error) {
     console.error('Error analyzing audio:', error);
