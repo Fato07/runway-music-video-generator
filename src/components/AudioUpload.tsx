@@ -5,12 +5,15 @@ import { Button } from './ui/button';
 import { analyzeAudio } from '@/app/services/audioAnalysisService';
 
 interface AudioUploadProps {
-  onAnalysisComplete: (analysisResults: {
-    beats: number[];
-    tempo: number;
-    mood: string;
-    segments: any[];
-  }) => void;
+  onAnalysisComplete: (
+    analysisResults: {
+      beats: number[];
+      tempo: number;
+      mood: string;
+      segments: any[];
+    },
+    fileName: string
+  ) => void;
 }
 
 export default function AudioUpload({ onAnalysisComplete }: AudioUploadProps) {
@@ -69,7 +72,7 @@ export default function AudioUpload({ onAnalysisComplete }: AudioUploadProps) {
         tempo: results.tempo,
         mood: results.segments[0]?.mood || 'neutral',
         segments: results.segments
-      });
+      }, file.name);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to analyze audio file');
       console.error('Audio analysis error:', err);

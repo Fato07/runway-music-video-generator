@@ -63,7 +63,7 @@ function createEnhancedPrompt(
 export async function generateSceneImages(
     sceneDescription: string,
     options: GenerateSceneImageOptions
-): Promise<string> {
+): Promise<{ imageUrl: string; prompt: string }> {
     try {
         const enhancedPrompt = createEnhancedPrompt(sceneDescription, options);
         console.log('Enhanced prompt:', enhancedPrompt); // For debugging
@@ -95,7 +95,10 @@ export async function generateSceneImages(
             throw new Error('No images returned from the API');
         }
 
-        return data.data[0].url;
+        return {
+            imageUrl: data.data[0].url,
+            prompt: enhancedPrompt
+        };
     } catch (error) {
         console.error('Error generating scene images:', error);
         throw error;

@@ -57,7 +57,7 @@ export default function Home() {
     const [error, setError] = useState<string | null>(null);
     const [currentStep, setCurrentStep] = useState<string>('waiting'); // 'waiting' | 'analyzing' | 'generating-description' | 'generating-image'
 
-    const handleAnalysisComplete = async (results: AnalysisResults) => {
+    const handleAnalysisComplete = async (results: AnalysisResults, fileName: string) => {
         setAnalysisResults(results);
         setCurrentStep('generating-description');
         
@@ -85,7 +85,7 @@ export default function Home() {
             setCurrentStep('generating-image');
 
             // Generate image with enhanced context
-            const imageUrl = await generateSceneImages(
+            const { imageUrl, prompt: imagePrompt } = await generateSceneImages(
                 description,
                 {
                     quality: "hd",
@@ -99,10 +99,10 @@ export default function Home() {
             setGeneratedImage(imageUrl);
             setCurrentStep('complete');
 
-            // Log the results
+            // Log the results with the original filename
             await logResults({
                 timestamp: new Date().toISOString(),
-                audioFileName: file.name,
+                audioFileName: fileName,
                 analysisResults: results,
                 scenePrompt: description,
                 sceneDescription: description,
