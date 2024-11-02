@@ -100,16 +100,26 @@ export default function Home() {
             setGeneratedImage(imageUrl);
             setCurrentStep('complete');
 
-            // Log the results with the original filename
-            await logResults({
-                timestamp: new Date().toISOString(),
-                audioFileName: fileName,
-                analysisResults: results,
-                scenePrompt: description,
-                sceneDescription: description,
-                imagePrompt,
-                imageUrl
+            // Log the results with the original filename through the API
+            const logResponse = await fetch('/api/log-results', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    timestamp: new Date().toISOString(),
+                    audioFileName: fileName,
+                    analysisResults: results,
+                    scenePrompt: description,
+                    sceneDescription: description,
+                    imagePrompt,
+                    imageUrl
+                })
             });
+
+            if (!logResponse.ok) {
+                throw new Error('Failed to log results');
+            }
         } catch (err) {
             setError(err instanceof Error ? err.message : 'Failed to generate scene and image');
             console.error('Generation error:', err);

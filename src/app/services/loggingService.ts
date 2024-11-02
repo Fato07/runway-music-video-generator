@@ -1,5 +1,9 @@
-import fs from 'fs';
+import { writeFile, mkdir } from 'fs/promises';
 import path from 'path';
+
+// Mark as server-side only
+export const dynamic = 'force-dynamic';
+export const runtime = 'nodejs';
 
 interface AnalysisLog {
     timestamp: string;
@@ -24,23 +28,21 @@ export async function logResults(log: AnalysisLog): Promise<void> {
     try {
         // Create results directory if it doesn't exist
         const resultsDir = path.join(process.cwd(), 'results');
-        if (!fs.existsSync(resultsDir)) {
-            fs.mkdirSync(resultsDir);
-        }
+        await mkdir(resultsDir, { recursive: true });
 
         // Create a timestamped folder for this analysis
         const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
         const analysisDir = path.join(resultsDir, `${timestamp}_${log.audioFileName}`);
-        fs.mkdirSync(analysisDir);
+        await mkdir(analysisDir, { recursive: true });
 
         // Write analysis results
-        fs.writeFileSync(
+        await writeFile(
             path.join(analysisDir, 'analysis.json'),
             JSON.stringify(log.analysisResults, null, 2)
         );
 
         // Write scene prompt and description
-        fs.writeFileSync(
+        await writeFile(
             path.join(analysisDir, 'scene.json'),
             JSON.stringify({
                 prompt: log.scenePrompt,
@@ -49,7 +51,7 @@ export async function logResults(log: AnalysisLog): Promise<void> {
         );
 
         // Write image prompt
-        fs.writeFileSync(
+        await writeFile(
             path.join(analysisDir, 'image.json'),
             JSON.stringify({
                 prompt: log.imagePrompt,
@@ -60,7 +62,7 @@ export async function logResults(log: AnalysisLog): Promise<void> {
         // Download and save the generated image
         const imageResponse = await fetch(log.imageUrl);
         const imageBuffer = Buffer.from(await imageResponse.arrayBuffer());
-        fs.writeFileSync(
+        await writeFile(
             path.join(analysisDir, 'generated-image.png'),
             imageBuffer
         );
