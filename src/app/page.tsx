@@ -18,6 +18,37 @@ interface AnalysisResults {
     tempo: number;
 }
 
+// Add the analyzeMoodPatterns helper function
+function analyzeMoodPatterns(segments: Segment[]) {
+    // Count occurrences of each mood
+    const moodCounts = segments.reduce((acc, segment) => {
+        acc[segment.mood] = (acc[segment.mood] || 0) + 1;
+        return acc;
+    }, {} as Record<string, number>);
+
+    // Find the most common mood
+    const dominantMood = Object.entries(moodCounts)
+        .reduce((a, b) => a[1] > b[1] ? a : b)[0];
+
+    // Identify mood transitions
+    const transitions = segments.reduce((acc, segment, i, arr) => {
+        if (i > 0 && segment.mood !== arr[i-1].mood) {
+            acc.push({
+                from: arr[i-1].mood,
+                to: segment.mood,
+                time: segment.start
+            });
+        }
+        return acc;
+    }, [] as Array<{from: string, to: string, time: number}>);
+
+    return {
+        dominantMood,
+        transitions,
+        moodCounts
+    };
+}
+
 export default function Home() {
     const [analysisResults, setAnalysisResults] = useState<AnalysisResults | null>(null);
     const [sceneDescription, setSceneDescription] = useState<string | null>(null);
@@ -34,28 +65,32 @@ export default function Home() {
             setIsGenerating(true);
             setError(null);
 
-            // Take the first segment and generate a scene description
             if (results.segments.length === 0) {
                 throw new Error('No segments found in analysis results');
             }
 
-            const firstSegment = results.segments[0];
+            // Analyze mood patterns
+            const moodPatterns = analyzeMoodPatterns(results.segments);
             
-            // Generate scene description
-            const description = await generateSceneDescription(
-                firstSegment, 
-                results.tempo
-            );
+            // Generate comprehensive description using the new interface
+            const description = await generateSceneDescription({
+                dominantMood: moodPatterns.dominantMood,
+                moodTransitions: moodPatterns.transitions,
+                tempo: results.tempo,
+                beatCount: results.beats.length,
+                segments: results.segments
+            });
+
             setSceneDescription(description);
             setCurrentStep('generating-image');
 
-            // Generate image based on the scene description
+            // Generate image with mood context
             const imageUrl = await generateSceneImages(
                 description,
                 {
                     quality: "high",
                     resolution: "1024x1024",
-                    theme: firstSegment.mood
+                    theme: moodPatterns.dominantMood
                 }
             );
 
