@@ -99,7 +99,41 @@ export default function Home() {
 
             setGeneratedImage(imageUrl);
             setImageVariations(variations || null);
+            
+            setCurrentStep('generating-video');
+            setIsGeneratingVideo(true);
+            
+            // Calculate appropriate motion intensity based on mood and tempo
+            const motionIntensity = (() => {
+                if (results.tempo > 140 || moodPatterns.dominantMood === 'energetic') return 'strong';
+                if (results.tempo > 90 || moodPatterns.dominantMood === 'dramatic') return 'moderate';
+                return 'subtle';
+            })();
+
+            // Calculate optimal video duration based on tempo
+            const duration = Math.min(4, Math.max(2, 60 / results.tempo * 4)); // 4 beats, max 4 seconds
+
+            // Determine transition style based on mood
+            const transitionStyle = moodPatterns.dominantMood === 'energetic' 
+                ? 'quick dissolves and dynamic transitions'
+                : 'smooth, gradual transitions';
+
+            const videoPath = await generateVideo(
+                imageUrl,
+                variations || [],
+                results.beats,
+                {
+                    motionIntensity,
+                    duration,
+                    mood: moodPatterns.dominantMood,
+                    tempo: results.tempo,
+                    transitionStyle
+                }
+            );
+            
+            setVideoUrl(videoPath);
             setCurrentStep('complete');
+            setIsGeneratingVideo(false);
 
             // Log the results with the original filename through the API
             const logResponse = await fetch('/api/log-results', {
@@ -200,6 +234,32 @@ export default function Home() {
                                 <p>Mood: {analysisResults.segments[0]?.mood}</p>
                             </div>
                         )}
+                    </div>
+                )}
+
+                {/* Video Result */}
+                {videoUrl && (
+                    <div className="mt-8 max-w-2xl mx-auto">
+                        <h2 className="text-xl font-semibold mb-4">Generated Video</h2>
+                        <video 
+                            controls 
+                            className="w-full rounded-lg shadow-lg"
+                            src={videoUrl}
+                        >
+                            Your browser does not support the video tag.
+                        </video>
+                    </div>
+                )}
+
+                {isGeneratingVideo && (
+                    <div className="mt-8 max-w-2xl mx-auto">
+                        <div className="animate-pulse space-y-4">
+                            <div className="h-4 bg-gray-200 rounded"></div>
+                            <div className="h-64 bg-gray-200 rounded"></div>
+                        </div>
+                        <p className="mt-4 text-gray-600">
+                            Generating video from scenes...
+                        </p>
                     </div>
                 )}
             </main>
