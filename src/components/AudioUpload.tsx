@@ -31,9 +31,11 @@ export default function AudioUpload({ onAnalysisComplete }: AudioUploadProps) {
   };
 
   const processFile = async (file: File) => {
-    const validTypes = ['audio/mp3', 'audio/wav', 'audio/mpeg'];
+    const validTypes = ['audio/wav', 'audio/x-wav', 'audio/wave'];
+    console.log('Processing file:', file.type);
+
     if (!validTypes.includes(file.type)) {
-      setError('Invalid file type. Please upload an MP3 or WAV file.');
+      setError('Please upload a WAV file.');
       return;
     }
 
@@ -41,16 +43,29 @@ export default function AudioUpload({ onAnalysisComplete }: AudioUploadProps) {
       setIsAnalyzing(true);
       setError(null);
 
-      // Create a temporary URL for the file
-      const fileUrl = URL.createObjectURL(file);
+      // Create FormData and append the file directly
+      const formData = new FormData();
+      formData.append('file', file);
 
-      // Process the audio file using the URL
-      const results = await analyzeAudio(fileUrl);
-      
-      // Clean up the temporary URL
-      URL.revokeObjectURL(fileUrl);
+      // Send the file directly to the Flask server
+      const response = await fetch('http://localhost:5001/analyze', {
+        method: 'POST',
+        body: formData
+      });
 
-      onAnalysisComplete(results);
+      if (!response.ok) {
+        throw new Error(`Server error: ${response.status}`);
+      }
+
+      const results = await response.json();
+      console.log('Analysis results:', results);
+
+      onAnalysisComplete({
+        beats: results.beats,
+        tempo: results.tempo,
+        mood: results.segments[0]?.mood || 'neutral',
+        segments: results.segments
+      });
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to analyze audio file');
       console.error('Audio analysis error:', err);
@@ -67,10 +82,10 @@ export default function AudioUpload({ onAnalysisComplete }: AudioUploadProps) {
     >
       <Button variant="outline" disabled={isAnalyzing}>
         <label className="cursor-pointer">
-          {isAnalyzing ? 'Analyzing...' : 'Upload Audio File'}
+          {isAnalyzing ? 'Analyzing...' : 'Upload WAV File'}
           <input
             type="file"
-            accept=".mp3,.wav"
+            accept=".wav"
             className="hidden"
             onChange={handleFileSelect}
             disabled={isAnalyzing}
@@ -79,7 +94,7 @@ export default function AudioUpload({ onAnalysisComplete }: AudioUploadProps) {
       </Button>
       
       <p className="text-sm text-gray-500">
-        Drag and drop an audio file here, or click to select
+        Drag and drop a WAV file here, or click to select
       </p>
       
       {error && (
