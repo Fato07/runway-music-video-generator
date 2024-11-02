@@ -1,6 +1,5 @@
 import { exec } from 'child_process';
 
-
 function executePythonScript(command: string): Promise<string> {
   return new Promise((resolve, reject) => {
     exec(command, (error, stdout, stderr) => {
@@ -68,4 +67,35 @@ export function extractMood(text: string): Promise<number> {
     });
   });
 }
+
+/**
+ * Segments an audio file using a Python script.
+ * @param {string} filePath - The path to the audio file.
+ * @returns {Promise<any>} - A promise that resolves to the audio segments.
+ */
+export function segmentAudio(filePath: string): Promise<any> {
+  return new Promise((resolve, reject) => {
+      exec(`python python-scripts/audio_analysis.py segment ${filePath}`, (error, stdout, stderr) => {
+          if (error) {
+              console.error(`Error: ${error.message}`);
+              reject(error);
+              return;
+          }
+          if (stderr) {
+              console.error(`Stderr: ${stderr}`);
+              reject(new Error(stderr));
+              return;
+          }
+          try {
+              const segments = JSON.parse(stdout);
+              resolve(segments);
+          } catch (parseError) {
+              console.error(`Error parsing JSON: ${parseError.message}`);
+              reject(parseError);
+          }
+      });
+  });
+}
+
+
 
