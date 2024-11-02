@@ -98,6 +98,17 @@ export default function Home() {
 
             setGeneratedImage(imageUrl);
             setCurrentStep('complete');
+
+            // Log the results
+            await logResults({
+                timestamp: new Date().toISOString(),
+                audioFileName: file.name,
+                analysisResults: results,
+                scenePrompt: description,
+                sceneDescription: description,
+                imagePrompt,
+                imageUrl
+            });
         } catch (err) {
             setError(err instanceof Error ? err.message : 'Failed to generate scene and image');
             console.error('Generation error:', err);

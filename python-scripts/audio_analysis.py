@@ -119,9 +119,15 @@ def analyze():
                 print(f"Error during analysis: {str(e)}")
                 return jsonify({'error': str(e)}), 500
             finally:
+                # Move the file to a results folder instead of deleting it
+                results_dir = os.path.join(os.path.dirname(filepath), 'results')
+                if not os.path.exists(results_dir):
+                    os.makedirs(results_dir)
+                
                 if os.path.exists(filepath):
-                    os.remove(filepath)
-                    print(f"Cleaned up file {filepath}")
+                    result_filepath = os.path.join(results_dir, filename)
+                    os.rename(filepath, result_filepath)
+                    print(f"Moved analyzed file to {result_filepath}")
     except Exception as e:
         print(f"Error processing request: {str(e)}")
         return jsonify({'error': 'Unknown error occurred'}), 500
