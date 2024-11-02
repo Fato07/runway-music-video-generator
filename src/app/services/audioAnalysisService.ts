@@ -20,7 +20,7 @@ export async function analyzeAudio(file: File): Promise<AudioAnalysisResult> {
     const formData = new FormData();
     formData.append('file', file);
 
-    const response = await fetch('http://localhost:5001/analyze', {
+    const response = await fetch('/api/analyze', {
       method: 'POST',
       body: formData,
     });
