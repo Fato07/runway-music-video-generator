@@ -98,10 +98,10 @@ def analyze():
             return jsonify({'error': 'No file selected'}), 400
             
         if file:
-        filename = secure_filename(file.filename)
-        filepath = os.path.join(UPLOAD_FOLDER, filename)
-        try:
-            file.save(filepath)
+            filename = secure_filename(file.filename)
+            filepath = os.path.join(UPLOAD_FOLDER, filename)
+            try:
+                file.save(filepath)
             print(f"File saved to {filepath}")
             
             results = analyze_audio_file(filepath)
