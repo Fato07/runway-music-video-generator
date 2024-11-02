@@ -8,9 +8,11 @@ from textblob import TextBlob
 from transformers import Wav2Vec2FeatureExtractor, Wav2Vec2Model
 import torch
 from flask import Flask, request, jsonify
+from flask_cors import CORS
 from werkzeug.utils import secure_filename
 
 app = Flask(__name__)
+CORS(app)
 
 # Configure upload folder
 UPLOAD_FOLDER = 'uploads'
@@ -69,7 +71,7 @@ def analyze_audio_file(file_path):
         
         return {
             "beats": beats.tolist(),
-            "tempo": float(tempo),
+            "tempo": float(tempo.item()),  # Convert numpy scalar to Python float properly
             "segments": segments
         }
         
@@ -80,27 +82,35 @@ def analyze_audio_file(file_path):
 @app.route('/analyze', methods=['POST'])
 def analyze():
     if 'file' not in request.files:
+        print("No file in request")
         return jsonify({'error': 'No file provided'}), 400
         
     file = request.files['file']
     if file.filename == '':
+        print("Empty filename")
         return jsonify({'error': 'No file selected'}), 400
         
     if file:
         filename = secure_filename(file.filename)
         filepath = os.path.join(UPLOAD_FOLDER, filename)
-        file.save(filepath)
-        
         try:
+            file.save(filepath)
+            print(f"File saved to {filepath}")
+            
             results = analyze_audio_file(filepath)
             if results:
+                print(f"Analysis completed successfully")
                 return jsonify(results)
             else:
+                print(f"Analysis failed")
                 return jsonify({'error': 'Analysis failed'}), 500
+        except Exception as e:
+            print(f"Error during analysis: {str(e)}")
+            return jsonify({'error': str(e)}), 500
         finally:
-            # Clean up the uploaded file
             if os.path.exists(filepath):
                 os.remove(filepath)
+                print(f"Cleaned up file {filepath}")
     
     return jsonify({'error': 'Unknown error occurred'}), 500
 
