@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import { Button } from './ui/button';
-import { detect_beats, analyze_tempo, extract_mood, segment_audio } from '@/python-scripts/audio_analysis';
+import { analyzeAudio } from '@/app/services/audioAnalysisService';
 
 interface AudioUploadProps {
   onAnalysisComplete: (analysisResults: {
@@ -45,20 +45,12 @@ export default function AudioUpload({ onAnalysisComplete }: AudioUploadProps) {
       const fileUrl = URL.createObjectURL(file);
 
       // Process the audio file using the URL
-      const beats = await detect_beats(fileUrl);
-      const tempo = await analyze_tempo(fileUrl);
-      const mood = await extract_mood(fileUrl);
-      const segments = await segment_audio(fileUrl);
-
+      const results = await analyzeAudio(fileUrl);
+      
       // Clean up the temporary URL
       URL.revokeObjectURL(fileUrl);
 
-      onAnalysisComplete({
-        beats,
-        tempo,
-        mood,
-        segments
-      });
+      onAnalysisComplete(results);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to analyze audio file');
       console.error('Audio analysis error:', err);
