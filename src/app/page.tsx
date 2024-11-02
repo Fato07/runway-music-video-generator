@@ -16,6 +16,7 @@ interface AnalysisResults {
     beats: number[];
     segments: Segment[];
     tempo: number;
+    variations?: string[];
 }
 
 // Add the analyzeMoodPatterns helper function
