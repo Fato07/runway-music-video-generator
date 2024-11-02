@@ -102,22 +102,22 @@ def analyze():
             filepath = os.path.join(UPLOAD_FOLDER, filename)
             try:
                 file.save(filepath)
-            print(f"File saved to {filepath}")
-            
-            results = analyze_audio_file(filepath)
-            if results:
-                print(f"Analysis completed successfully")
-                return jsonify(results)
-            else:
-                print(f"Analysis failed")
-                return jsonify({'error': 'Analysis failed'}), 500
-        except Exception as e:
-            print(f"Error during analysis: {str(e)}")
-            return jsonify({'error': str(e)}), 500
-        finally:
-            if os.path.exists(filepath):
-                os.remove(filepath)
-                print(f"Cleaned up file {filepath}")
+                print(f"File saved to {filepath}")
+                
+                results = analyze_audio_file(filepath)
+                if results:
+                    print(f"Analysis completed successfully")
+                    return jsonify(results)
+                else:
+                    print(f"Analysis failed")
+                    return jsonify({'error': 'Analysis failed'}), 500
+            except Exception as e:
+                print(f"Error during analysis: {str(e)}")
+                return jsonify({'error': str(e)}), 500
+            finally:
+                if os.path.exists(filepath):
+                    os.remove(filepath)
+                    print(f"Cleaned up file {filepath}")
     
     return jsonify({'error': 'Unknown error occurred'}), 500
 
