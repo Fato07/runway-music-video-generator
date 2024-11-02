@@ -1,5 +1,11 @@
 This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
+
+docs:
+- https://platform.openai.com/docs/api-reference/images/create
+- https://github.com/runwayml/sdk-node/blob/main/src/resources/tasks.ts
+- https://platform.openai.com/docs/guides/images/usage?lang=node.js
+- https://docs.dev.runwayml.com/guides/quickstart/
 ## Getting Started
 
 First, run the development server:

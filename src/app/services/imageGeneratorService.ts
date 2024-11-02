@@ -1,39 +1,54 @@
-import OpenAI from "openai";
+export interface GenerateSceneImageOptions {
+    quality: string;
+    resolution: string;
+    theme: string;
+}
 
-const openai = new OpenAI({
-    apiKey: process.env.OPENAI_API_KEY,
-});
+interface DalleResponse {
+    created: number;
+    data: Array<{
+        url: string;
+    }>;
+}
 
- export interface GenerateSceneImageOptions {
-     quality: string;
-     resolution: string;
-     theme: string;
- }
+const OPENAI_API_KEY = process.env.OPENAI_API_KEY;
 
- /**
-  * Generates a scene image using DALL-E or Stable Diffusion based on the provided scene description.
-  * @param {string} sceneDescription - The description of the scene to generate an image for.
-  * @param {GenerateSceneImageOptions} options - Options for adjusting image quality, resolution, and theme.
-  * @returns {Promise<string>} - A promise that resolves to the URL of the generated image.
-  */
- export async function generateSceneImage(sceneDescription: string, options: GenerateSceneImageOptions): Promise<string> {
-     try {
-
-            const response = await openai.images.generate({
+/**
+ * Generates scene images using DALL-E or Stable Diffusion based on the provided scene description.
+ * @param {string} sceneDescription - The description of the scene to generate images for.
+ * @param {GenerateSceneImageOptions} options - Options for adjusting image quality, resolution, and theme.
+ * @returns {Promise<string[]>} - A promise that resolves to an array of image URLs.
+ */
+export async function generateSceneImages(sceneDescription: string, options?: GenerateSceneImageOptions): Promise<string> {
+    try {
+        const response = await fetch('https://api.openai.com/v1/images/generations', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${OPENAI_API_KEY}`,
+            },
+            body: JSON.stringify({
                 model: "dall-e-3",
                 prompt: sceneDescription,
-                n: 5,
+                n: 1,
                 size: "1024x1024",
-            });
+            }),
+        });
 
-         const imageUrl = response.data[0].url;
-         if (!imageUrl) {
-             throw new Error('No image URL returned from the API');
-         }
-         return imageUrl;
-     } catch (error) {
-         console.error('Error generating scene image:', error);
-         throw error;
-     }
+        if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(`OpenAI API Error: ${response.status} - ${JSON.stringify(errorData)}`);
+        }
 
+        const data: DalleResponse = await response.json();
+        
+        if (!data.data || data.data.length === 0) {
+            throw new Error('No images returned from the API');
+        }
+
+        return data.data[0].url;
+    } catch (error) {
+        console.error('Error generating scene images:', error);
+        throw error;
+    }
 }

@@ -5,10 +5,18 @@ interface Segment {
     mood: string;
 }
 
-interface AnalysisResults {
-    beats: number[];
-    segments: Segment[];
+interface MoodTransition {
+    from: string;
+    to: string;
+    time: number;
+}
+
+interface SceneDescriptionInput {
+    dominantMood: string;
+    moodTransitions: MoodTransition[];
     tempo: number;
+    beatCount: number;
+    segments: Segment[];
 }
 
 interface ChatCompletionResponse {
@@ -36,8 +44,17 @@ interface ChatCompletionResponse {
     };
 }
 
-export async function generateSceneDescription(segment: Segment, tempo: number): Promise<string> {
+export async function generateSceneDescription(input: SceneDescriptionInput): Promise<string> {
     try {
+        // Create a more descriptive tempo characterization
+        const tempoDescription = input.tempo > 120 ? "fast-paced" : 
+                               input.tempo > 90 ? "moderate" : "slow and steady";
+        
+        // Format the mood transitions for the prompt
+        const transitionDescriptions = input.moodTransitions
+            .map(t => `${t.from} to ${t.to} at ${t.time.toFixed(2)}s`)
+            .join(', ');
+
         const response = await fetch('https://api.openai.com/v1/chat/completions', {
             method: 'POST',
             headers: {
@@ -50,26 +67,27 @@ export async function generateSceneDescription(segment: Segment, tempo: number):
                     {
                         role: 'user',
                         content: `
-                        As a creative visionary, you are to compose vivid and imaginative scene descriptions for an animated music video based on the audio segment below. The scene should:
+                        As a creative visionary, compose a vivid and imaginative scene description 
+                        for an animated music video with the following musical characteristics:
 
+                        - Overall tempo: ${tempoDescription} (${input.tempo} BPM)
+                        - Dominant mood: ${input.dominantMood}
+                        - Beat structure: ${input.beatCount} distinct beats
+                        - Mood transitions: ${transitionDescriptions}
+
+                        The scene should:
                         - Evoke strong imagery through sensory details (sight, sound, touch)
-                        - Utilize metaphors or symbolism that align with the music's mood
+                        - Utilize metaphors or symbolism that align with the music's mood changes
                         - Reflect an artistic style reminiscent of surrealism
                         - Be approximately 150-200 words in length
-
-                        Audio Segment Details:
-                        - Time Range: ${segment.start}s to ${segment.end}s
-                        - Mood: ${segment.mood}
-                        - Tempo: ${tempo} BPM
-                        - Description: ${segment.description}
-
-                        Please craft a captivating narrative that brings the music to life visually.
+                        - Include specific visual elements that can transition with the mood changes
+                        
+                        Please craft a captivating narrative that brings these musical elements to life visually.
                         `
                     }
                 ],
                 temperature: 0.7,
             })
-        });
 
         if (!response.ok) {
             const errorData = await response.json();

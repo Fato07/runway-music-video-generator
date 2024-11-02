@@ -20,6 +20,10 @@ CORS(app, resources={
     }
 })
 
+# Enable hot reloading and debug output
+app.debug = True
+app.config['TEMPLATES_AUTO_RELOAD'] = True
+
 # Configure upload folder
 UPLOAD_FOLDER = 'uploads'
 if not os.path.exists(UPLOAD_FOLDER):
@@ -118,9 +122,16 @@ def analyze():
                 if os.path.exists(filepath):
                     os.remove(filepath)
                     print(f"Cleaned up file {filepath}")
-    
-    return jsonify({'error': 'Unknown error occurred'}), 500
+    except Exception as e:
+        print(f"Error processing request: {str(e)}")
+        return jsonify({'error': 'Unknown error occurred'}), 500
 
 if __name__ == "__main__":
-    app.run(host='0.0.0.0', port=5001)
-
+    # Enable hot reloading and debugging
+    app.run(
+        host='0.0.0.0', 
+        port=5001,
+        debug=True,  # Enables debug mode
+        use_reloader=True,  # Enables hot reloading
+        threaded=True  # Enables threaded processing
+    )
