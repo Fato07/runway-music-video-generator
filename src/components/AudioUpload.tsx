@@ -50,7 +50,11 @@ export default function AudioUpload({ onAnalysisComplete }: AudioUploadProps) {
       // Send the file directly to the Flask server
       const response = await fetch('http://localhost:5001/analyze', {
         method: 'POST',
-        body: formData
+        body: formData,
+        headers: {
+          'Accept': 'application/json',
+        },
+        mode: 'cors'
       });
 
       if (!response.ok) {

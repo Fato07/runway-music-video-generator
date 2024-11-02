@@ -12,7 +12,13 @@ from flask_cors import CORS
 from werkzeug.utils import secure_filename
 
 app = Flask(__name__)
-CORS(app)
+CORS(app, resources={
+    r"/analyze": {
+        "origins": ["http://localhost:3000"],
+        "methods": ["POST"],
+        "allow_headers": ["Content-Type"]
+    }
+})
 
 # Configure upload folder
 UPLOAD_FOLDER = 'uploads'
@@ -81,9 +87,10 @@ def analyze_audio_file(file_path):
 
 @app.route('/analyze', methods=['POST'])
 def analyze():
-    if 'file' not in request.files:
-        print("No file in request")
-        return jsonify({'error': 'No file provided'}), 400
+    try:
+        if 'file' not in request.files:
+            print("No file in request")
+            return jsonify({'error': 'No file provided'}), 400
         
     file = request.files['file']
     if file.filename == '':
