@@ -1,3 +1,4 @@
+import 'openai/shims/node';
 import { generateSceneImage, GenerateSceneImageOptions } from '../services/imageGeneratorService';
 import OpenAI from 'openai';
 import { createMock } from 'ts-auto-mock';
