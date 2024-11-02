@@ -61,8 +61,7 @@ export async function logResults(log: AnalysisLog): Promise<void> {
         );
 
         // Download and save the generated image
-        const proxyUrl = `/api/proxy-image?url=${encodeURIComponent(log.imageUrl)}`;
-        const imageResponse = await fetch(proxyUrl);
+        const imageResponse = await fetch(log.imageUrl);
         const imageBuffer = Buffer.from(await imageResponse.arrayBuffer());
         await writeFile(
             path.join(analysisDir, 'generated-image.png'),
@@ -75,8 +74,7 @@ export async function logResults(log: AnalysisLog): Promise<void> {
             await mkdir(variationsDir, { recursive: true });
 
             await Promise.all(log.variations.map(async (variationUrl, index) => {
-                const proxyUrl = `/api/proxy-image?url=${encodeURIComponent(variationUrl)}`;
-                const variationResponse = await fetch(proxyUrl);
+                const variationResponse = await fetch(variationUrl);
                 const variationBuffer = Buffer.from(await variationResponse.arrayBuffer());
                 await writeFile(
                     path.join(variationsDir, `variation-${index + 1}.png`),
