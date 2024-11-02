@@ -49,3 +49,74 @@ const AudioUpload: React.FC<AudioUploadProps> = ({ onFileSelect }) => {
 };
 
 export default AudioUpload;
+'use client';
+
+import { useState } from 'react';
+import { Button } from './ui/button';
+import { detect_beats, analyze_tempo, extract_mood, segment_audio } from '@/python-scripts/audio_analysis';
+
+interface AudioUploadProps {
+  onAnalysisComplete: (analysisResults: {
+    beats: number[];
+    tempo: number;
+    mood: string;
+    segments: any[];
+  }) => void;
+}
+
+export default function AudioUpload({ onAnalysisComplete }: AudioUploadProps) {
+  const [isAnalyzing, setIsAnalyzing] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const handleFileSelect = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    try {
+      setIsAnalyzing(true);
+      setError(null);
+
+      // Process the audio file
+      const beats = await detect_beats(file.path);
+      const tempo = await analyze_tempo(file.path);
+      const mood = await extract_mood(file.path);
+      const segments = await segment_audio(file.path);
+
+      onAnalysisComplete({
+        beats,
+        tempo,
+        mood,
+        segments
+      });
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to analyze audio file');
+      console.error('Audio analysis error:', err);
+    } finally {
+      setIsAnalyzing(false);
+    }
+  };
+
+  return (
+    <div className="flex flex-col items-center gap-4">
+      <Button
+        variant="outline"
+        disabled={isAnalyzing}
+      >
+        <label className="cursor-pointer">
+          {isAnalyzing ? 'Analyzing...' : 'Upload Audio File'}
+          <input
+            type="file"
+            accept="audio/*"
+            className="hidden"
+            onChange={handleFileSelect}
+            disabled={isAnalyzing}
+          />
+        </label>
+      </Button>
+      
+      {error && (
+        <p className="text-red-500 text-sm">{error}</p>
+      )}
+    </div>
+  );
+}
