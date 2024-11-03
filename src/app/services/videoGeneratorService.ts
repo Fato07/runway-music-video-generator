@@ -17,28 +17,28 @@ interface VideoGenerationOptions {
 
 function createVideoPrompt(options: VideoGenerationOptions): string {
     const moodToMovement = {
-        'energetic': 'Smooth camera movement forward with dynamic flow',
-        'calm': 'Gentle floating camera movement',
-        'mysterious': 'Slow, deliberate dolly movement',
-        'dramatic': 'Steady push-in camera movement'
+        'energetic': 'A rapid, dynamic flow with sweeping, bold camera angles and intense action',
+        'calm': 'A gentle, floating movement with soft, tranquil transitions and serene atmosphere',
+        'mysterious': 'A slow, deliberate dolly movement with shadowy, surreal elements and enigmatic lighting',
+        'dramatic': 'A steady, cinematic push-in movement with rich, bold colors and intense lighting'
     };
 
-    const getTempoMovement = (tempo: number) => {
-        if (tempo > 140) return 'with swift, fluid motion';
-        if (tempo > 100) return 'with steady, continuous motion';
-        return 'with graceful, measured motion';
-    };
+    const tempoDescriptor = options.tempo > 140 
+        ? 'swift and fluid'
+        : options.tempo > 100 
+            ? 'steady and rhythmic'
+            : 'slow and measured';
 
     return `
         ${moodToMovement[options.mood as keyof typeof moodToMovement] || 'Smooth camera movement'} 
-        ${getTempoMovement(options.tempo)}.
+        with ${tempoDescriptor} motion.
         
-        ${options.shouldLoop ? 'Create a seamless loop.' : 'Continuous fluid motion.'} 
-        ${options.transitionStyle || 'Natural and smooth transitions.'}
+        ${options.shouldLoop ? 'Create a seamless loop.' : 'Continuous, flowing transitions.'} 
+        ${options.transitionStyle || 'Smooth, cinematic transitions.'}
         
-        Cinematic lighting and composition.
-        Maintain consistent atmosphere throughout.
-        No camera shake or jerky movements.
+        Emphasize cinematic lighting and composition, with ${options.motionIntensity || 'moderate'} motion intensity.
+        Maintain a consistent ${options.mood} atmosphere throughout.
+        No jarring camera shake or abrupt movements.
     `.trim();
 }
 
