@@ -165,7 +165,9 @@ export default function Home() {
             setVideoUrl(videoUrl);
 
             // Optionally download the video for reference
-            const analysisDir = 'your_analysis_directory'; // Define analysisDir appropriately
+            // Define analysisDir using a unique identifier
+            const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
+            const analysisDir = `results/${timestamp}_${fileName}`;
             await downloadFile(videoUrl, `${fileName}.mp4`, analysisDir);
             setCurrentStep('complete');
             setVideoGenStatus({ 
