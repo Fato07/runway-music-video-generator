@@ -11,6 +11,8 @@ interface VideoGenerationOptions {
     transitionStyle?: string;
     aspectRatio?: '16:9' | '9:16';
     shouldLoop?: boolean;
+    motionIntensity?: 'strong' | 'moderate' | 'subtle';
+    duration?: number;
 }
 
 function createVideoPrompt(options: VideoGenerationOptions): string {

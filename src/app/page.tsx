@@ -106,31 +106,26 @@ export default function Home() {
             setIsGeneratingVideo(true);
             
             // Calculate appropriate motion intensity based on mood and tempo
-            const motionIntensity = (() => {
-                if (results.tempo > 140 || moodPatterns.dominantMood === 'energetic') return 'strong';
-                if (results.tempo > 90 || moodPatterns.dominantMood === 'dramatic') return 'moderate';
-                return 'subtle';
-            })();
-
-            // Calculate optimal video duration based on tempo
-            const duration = Math.min(4, Math.max(2, 60 / results.tempo * 4)); // 4 beats, max 4 seconds
-
-            // Determine transition style based on mood
-            const transitionStyle = moodPatterns.dominantMood === 'energetic' 
-                ? 'quick dissolves and dynamic transitions'
-                : 'smooth, gradual transitions';
+            // Determine video generation parameters based on analysis
+            const videoParams = {
+                mood: moodPatterns.dominantMood,
+                tempo: results.tempo,
+                motionIntensity: (results.tempo > 140 || moodPatterns.dominantMood === 'energetic' 
+                    ? 'strong' 
+                    : results.tempo > 90 || moodPatterns.dominantMood === 'dramatic' 
+                        ? 'moderate' 
+                        : 'subtle') as 'strong' | 'moderate' | 'subtle',
+                duration: Math.min(4, Math.max(2, 60 / results.tempo * 4)), // 4 beats, max 4 seconds
+                transitionStyle: moodPatterns.dominantMood === 'energetic' 
+                    ? 'quick dissolves and dynamic transitions'
+                    : 'smooth, gradual transitions'
+            };
 
             const videoPath = await generateVideo(
                 imageUrl,
                 variations || [],
                 results.beats,
-                {
-                    motionIntensity,
-                    duration,
-                    mood: moodPatterns.dominantMood,
-                    tempo: results.tempo,
-                    transitionStyle
-                }
+                videoParams
             );
             
             setVideoUrl(videoPath);
