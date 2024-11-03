@@ -146,12 +146,12 @@ export async function generateSceneImages(
         const imageUrl = data.data[0].url;
         
         // Generate variations
-        const variations = await generateImageVariations(imageUrl);
+        // const variations = await generateImageVariations(imageUrl);
 
         return {
             imageUrl,
             prompt: enhancedPrompt,
-            variations
+            // variations
         };
     } catch (error) {
         console.error('Error generating scene images:', error);
