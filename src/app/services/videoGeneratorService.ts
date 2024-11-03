@@ -101,79 +101,30 @@ export async function generateVideo(
 
         await validateImageForRunway(mainImage);
 
-        const client = new RunwayML({
-            apiKey: process.env.RUNWAYML_API_SECRET
+        const response = await fetch('/api/generate-video', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                mainImage,
+                variations,
+                beats,
+                options: {
+                    ...options,
+                    promptText: createVideoPrompt(options)
+                }
+            })
         });
 
-        const duration = determineOptimalDuration(options.tempo, beats);
-
-        videoGenerationEvents.emit('progress', {
-            status: 'generating',
-            message: `Generating ${duration}s video...`
-        });
-
-        const mainVideoTask = await client.imageToVideo.create({
-            model: 'gen3a_turbo',
-            promptImage: mainImage,
-            duration,
-            promptText: createVideoPrompt(options),
-            ratio: options.aspectRatio || '16:9',
-            watermark: false
-        });
-
-        // Enhanced error handling during polling
-        let task;
-        let attempts = 0;
-        const maxAttempts = 30; // 1 minute timeout
-        
-        do {
-            await new Promise(resolve => setTimeout(resolve, 2000));
-            task = await client.tasks.retrieve(mainVideoTask.id);
-            attempts++;
-
-            videoGenerationEvents.emit('progress', {
-                status: 'processing',
-                message: 'Processing video...',
-                progress: Math.min(90, Math.floor((attempts / maxAttempts) * 100))
-            });
-
-            if (attempts >= maxAttempts) {
-                throw new Error('Video generation timed out');
-            }
-        } while (task.status === 'RUNNING');
-
-        if (task.status === 'FAILED') {
-            throw new Error(`Video generation failed: ${task.failure || task.failureCode}`);
+        if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(`Server error: ${response.status} - ${errorData.error}`);
         }
 
-        if (!task.output?.[0]) {
-            throw new Error('No video output received');
-        }
+        const { videoUrl } = await response.json();
 
-        videoGenerationEvents.emit('progress', {
-            status: 'downloading',
-            message: 'Downloading generated video...',
-            progress: 95
-        });
-
-        // Create a timestamp-based analysis ID that includes the original filename
-        const safeFileName = options.analysisFileName.replace(/[^a-zA-Z0-9]/g, '_');
-        const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
-        const analysisId = `${timestamp}_${safeFileName}`;
-        
-        const videoPath = await downloadWithRetry(
-            task.output[0],
-            'generated-video.mp4',
-            analysisId
-        );
-
-        videoGenerationEvents.emit('progress', {
-            status: 'complete',
-            message: 'Video generation complete',
-            progress: 100
-        });
-
-        return videoPath;
+        return videoUrl;
 
     } catch (error) {
         videoGenerationEvents.emit('error', {
