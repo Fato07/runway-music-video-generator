@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from "react";
+import { generateAnalysisDir } from "@/utils/directoryUtils";
 import { downloadFile } from "@/utils/fileUtils";
 import AudioUpload from "@/components/AudioUpload";
 import { generateSceneImages } from "./services/imageGeneratorService";
@@ -165,9 +166,8 @@ export default function Home() {
             setVideoUrl(videoUrl);
 
             // Optionally download the video for reference
-            // Define analysisDir using a unique identifier
-            const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
-            const analysisDir = `results/${timestamp}_${fileName}`;
+            // Use the utility function to generate the analysis directory
+            const analysisDir = generateAnalysisDir(fileName);
             await downloadFile(videoUrl, `${fileName}.mp4`, analysisDir);
             setCurrentStep('complete');
             setVideoGenStatus({ 
