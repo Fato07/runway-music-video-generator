@@ -93,7 +93,7 @@ export default function Home() {
             setCurrentStep('generating-image');
 
             // Generate image with enhanced context
-            const { imageUrl, prompt: imagePrompt, variations } = await generateSceneImages(
+            const { imageUrl, prompt: imagePrompt /*, variations */ } = await generateSceneImages(
                 description,
                 {
                     quality: "hd",
@@ -105,7 +105,7 @@ export default function Home() {
             );
 
             setGeneratedImage(imageUrl);
-            setImageVariations(variations || null);
+            // setImageVariations(variations || null);
             
             setCurrentStep('generating-video');
             setVideoGenStatus({ 
@@ -252,7 +252,7 @@ export default function Home() {
                             </div>
                             
                             {/* Image Variations */}
-                            <div className="grid grid-cols-2 gap-4 max-w-2xl mx-auto">
+                            {/* <div className="grid grid-cols-2 gap-4 max-w-2xl mx-auto">
                                 {imageVariations?.map((variationUrl, index) => (
                                     <div key={index} className="relative group">
                                         <img 
@@ -265,7 +265,7 @@ export default function Home() {
                                         </div>
                                     </div>
                                 ))}
-                            </div>
+                            </div> */}
                         </div>
                         
                         {analysisResults && (
