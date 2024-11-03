@@ -162,8 +162,10 @@ export default function Home() {
                 videoParams
             );
             
-            const videoPath = await downloadFile(videoUrl, `${fileName}.mp4`, fileName);
-            setVideoUrl(videoPath);
+            setVideoUrl(videoUrl);
+
+            // Optionally download the video for reference
+            await downloadFile(videoUrl, `${fileName}.mp4`, fileName);
             setCurrentStep('complete');
             setVideoGenStatus({ 
                 status: 'complete', 
