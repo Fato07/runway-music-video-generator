@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from "react";
+import { downloadFile } from "@/utils/fileUtils";
 import AudioUpload from "@/components/AudioUpload";
 import { generateSceneImages } from "./services/imageGeneratorService";
 import { generateSceneDescription } from "./services/sceneGeneratorService";
