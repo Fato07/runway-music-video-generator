@@ -23,9 +23,8 @@ export async function POST(request: NextRequest) {
         if (!response.ok) {
             throw new Error(`Failed to fetch video: ${response.status}`);
         }
-        
         const buffer = await response.arrayBuffer();
-        await fs.writeFile(filePath, buffer);
+        await fs.writeFile(filePath, Buffer.from(buffer));
 
         // Return the relative path
         const relativePath = `/results/${analysisId}/${filename}`;
