@@ -25,7 +25,7 @@ interface AnalysisLog {
     variations?: string[];
 }
 
-export async function logResults(log: AnalysisLog): Promise<void> {
+export async function logResults(log: AnalysisLog): Promise<string> {
     try {
         // Create results directory if it doesn't exist
         const resultsDir = path.join(process.cwd(), 'results');
