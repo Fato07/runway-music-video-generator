@@ -66,6 +66,7 @@ export default function Home() {
     }>({ status: 'idle', message: '' });
 
     const handleAnalysisComplete = async (results: AnalysisResults, fileName: string) => {
+        if (typeof window === 'undefined') return; // Ensure this runs only on the client
         setAnalysisResults(results);
         setCurrentStep('generating-description');
         
