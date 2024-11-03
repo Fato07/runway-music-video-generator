@@ -102,7 +102,7 @@ export async function generateVideo(
         await validateImageForRunway(mainImage);
 
         const client = new RunwayML({
-            apiKey: process.env.RUNWAYML_API_KEY as string
+            apiKey: process.env.RUNWAYML_API_SECRET
         });
 
         const duration = determineOptimalDuration(options.tempo, beats);
