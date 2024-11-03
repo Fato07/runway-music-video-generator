@@ -107,7 +107,7 @@ export async function generateVideo(
             },
             body: JSON.stringify({
                 mainImage,
-                variations,
+                // variations,
                 beats,
                 options: {
                     ...options,
