@@ -13,6 +13,7 @@ interface VideoGenerationOptions {
     shouldLoop?: boolean;
     motionIntensity?: 'strong' | 'moderate' | 'subtle';
     duration?: number;
+    analysisFileName: string;  // Required to track which audio file this is for
 }
 
 function createVideoPrompt(options: VideoGenerationOptions): string {
@@ -60,14 +61,15 @@ async function validateImageForRunway(imageUrl: string): Promise<void> {
     }
 }
 
-async function downloadWithRetry(url: string, filename: string, maxRetries = 3): Promise<string> {
+async function downloadWithRetry(url: string, filename: string, analysisId: string, maxRetries = 3): Promise<string> {
     let lastError;
     
     for (let i = 0; i < maxRetries; i++) {
         try {
-            return await downloadFile(url, filename);
+            return await downloadFile(url, filename, analysisId);
         } catch (error) {
             lastError = error;
+            console.error(`Download attempt ${i + 1} failed:`, error);
             await new Promise(resolve => setTimeout(resolve, 2000 * (i + 1)));
         }
     }
@@ -144,7 +146,16 @@ export async function generateVideo(
             progress: 95
         });
 
-        const videoPath = await downloadWithRetry(task.output[0], `music-video-${Date.now()}.mp4`);
+        // Create a timestamp-based analysis ID that includes the original filename
+        const safeFileName = options.analysisFileName.replace(/[^a-zA-Z0-9]/g, '_');
+        const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
+        const analysisId = `${timestamp}_${safeFileName}`;
+        
+        const videoPath = await downloadWithRetry(
+            task.output[0],
+            'generated-video.mp4',
+            analysisId
+        );
 
         videoGenerationEvents.emit('progress', {
             status: 'complete',

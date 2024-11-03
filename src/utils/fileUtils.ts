@@ -1,15 +1,25 @@
-import fs from 'fs/promises';
-import path from 'path';
-import fetch from 'node-fetch';
+export async function downloadFile(url: string, filename: string, analysisId: string): Promise<string> {
+    if (!url || !filename || !analysisId) {
+        throw new Error('Missing required parameters for file download');
+    }
 
-export async function downloadFile(url: string, filename: string): Promise<string> {
-  const uploadDir = path.join(process.cwd(), 'uploads', 'videos');
-  await fs.mkdir(uploadDir, { recursive: true });
+    const response = await fetch('/api/download', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ 
+            url, 
+            filename,
+            analysisId 
+        }),
+    });
 
-  const filePath = path.join(uploadDir, filename);
-  const response = await fetch(url);
-  const buffer = await response.buffer();
-  await fs.writeFile(filePath, buffer);
+    if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.error || 'Failed to download file');
+    }
 
-  return filePath;
+    const { filePath } = await response.json();
+    return filePath;
 }
