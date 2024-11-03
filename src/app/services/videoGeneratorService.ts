@@ -30,9 +30,13 @@ function createVideoPrompt(options: VideoGenerationOptions): string {
             ? 'steady and rhythmic'
             : 'slow and measured';
 
+    const styleDescription = options.style === 'surreal'
+        ? 'surrealistic elements with dreamlike, abstract forms'
+        : 'realistic details with life-like, grounded compositions';
+
     return `
         ${moodToMovement[options.mood as keyof typeof moodToMovement] || 'Smooth camera movement'} 
-        with ${tempoDescriptor} motion.
+        with ${tempoDescriptor} motion and ${styleDescription}.
         
         ${options.shouldLoop ? 'Create a seamless loop.' : 'Continuous, flowing transitions.'} 
         ${options.transitionStyle || 'Smooth, cinematic transitions.'}

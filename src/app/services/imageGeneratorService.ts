@@ -4,6 +4,7 @@ export interface GenerateSceneImageOptions {
     theme: string;
     tempo?: number;
     moodTransitions?: Array<{from: string, to: string, time: number}>;
+    style: 'surreal' | 'real-world'; // Add this line
 }
 
 /**
@@ -80,6 +81,10 @@ function createEnhancedPrompt(
         ? 'vibrant colors, dynamic composition, strong contrast'
         : 'soft colors, gentle transitions, subtle harmony';
 
+    const styleDescription = options.style === 'surreal'
+        ? 'surrealistic elements with dreamlike, abstract forms'
+        : 'realistic details with life-like, grounded compositions';
+
     const transitionsDescription = options.moodTransitions?.length
         ? `The scene should smoothly transition between moods: ${
             options.moodTransitions
@@ -98,7 +103,7 @@ function createEnhancedPrompt(
     - Use color palette that reflects the ${options.theme} mood
     - Create visual flow that matches the musical rhythm
     - Include subtle visual metaphors for mood transitions
-    - Maintain surrealist artistic style
+    - Maintain ${options.style} artistic style
     - Ensure high visual coherence and professional quality`;
 }
 

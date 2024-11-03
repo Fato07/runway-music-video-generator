@@ -52,6 +52,7 @@ function analyzeMoodPatterns(segments: Segment[]) {
 
 export default function Home() {
     const [analysisResults, setAnalysisResults] = useState<AnalysisResults | null>(null);
+    const [style, setStyle] = useState<'surreal' | 'real-world'>('surreal'); // Add this state
     const [sceneDescription, setSceneDescription] = useState<string | null>(null);
     const [generatedImage, setGeneratedImage] = useState<string | null>(null);
     const [imageVariations, setImageVariations] = useState<string[] | null>(null);
@@ -103,7 +104,8 @@ export default function Home() {
                     resolution: "1024x1024",
                     theme: moodPatterns.dominantMood,
                     tempo: results.tempo,
-                    moodTransitions: moodPatterns.transitions
+                    moodTransitions: moodPatterns.transitions,
+                    style // Pass the style option
                 }
             );
 
@@ -149,7 +151,8 @@ export default function Home() {
                 transitionStyle: moodPatterns.dominantMood === 'energetic' 
                     ? 'quick dissolves and dynamic transitions'
                     : 'smooth, gradual transitions',
-                analysisFileName: fileName // Add the required property
+                analysisFileName: fileName, // Add the required property
+                style // Pass the style option
             };
 
             const videoPath = await generateVideo(
@@ -211,6 +214,19 @@ export default function Home() {
                 <h1 className="text-4xl font-bold text-center mb-8">Music Video Scene Generator</h1>
                 
                 <AudioUpload onAnalysisComplete={handleAnalysisComplete} />
+
+                {/* Style selection */}
+                <div className="mt-4">
+                    <label className="block text-sm font-medium text-gray-700">Select Style:</label>
+                    <select
+                        value={style}
+                        onChange={(e) => setStyle(e.target.value as 'surreal' | 'real-world')}
+                        className="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md"
+                    >
+                        <option value="surreal">Surreal</option>
+                        <option value="real-world">Real-World</option>
+                    </select>
+                </div>
                 
                 {error && (
                     <div className="mt-6 p-4 bg-red-50 border border-red-200 rounded-lg">
