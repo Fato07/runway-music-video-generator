@@ -3,7 +3,7 @@ import RunwayML from '@runwayml/sdk';
 
 export async function POST(request: NextRequest) {
     try {
-        const { mainImage, variations, beats, options } = await request.json();
+        const { mainImage, beats, options } = await request.json();
 
         const client = new RunwayML({
             apiKey: process.env.RUNWAYML_API_SECRET

@@ -89,7 +89,6 @@ async function downloadWithRetry(url: string, filename: string, analysisId: stri
 
 export async function generateVideo(
     mainImage: string,
-    variations: string[],
     beats: number[],
     options: VideoGenerationOptions
 ): Promise<string> {
