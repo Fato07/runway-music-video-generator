@@ -89,18 +89,20 @@ export async function generateSceneDescription(input: SceneDescriptionInput): Pr
                 temperature: 0.7,
             })
 
+        }); 
+
         if (!response.ok) {
-            const errorData = await response.json();
-            throw new Error(`OpenAI API Error: ${response.status} - ${JSON.stringify(errorData)}`);
-        }
+                const errorData = await response.json();
+                throw new Error(`OpenAI API Error: ${response.status} - ${JSON.stringify(errorData)}`);
+            }
 
-        const data: ChatCompletionResponse = await response.json();
-        
-        if (!data.choices || data.choices.length === 0 || !data.choices[0].message.content) {
-            throw new Error('Invalid response from OpenAI API');
-        }
+            const data: ChatCompletionResponse = await response.json();
+            
+            if (!data.choices || data.choices.length === 0 || !data.choices[0].message.content) {
+                throw new Error('Invalid response from OpenAI API');
+            }
 
-        return data.choices[0].message.content.trim();
+            return data.choices[0].message.content.trim();
     } catch (error) {
         console.error('Error generating scene description:', error);
         throw error;

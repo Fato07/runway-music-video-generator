@@ -4,6 +4,7 @@ import { useState } from "react";
 import AudioUpload from "@/components/AudioUpload";
 import { generateSceneImages } from "./services/imageGeneratorService";
 import { generateSceneDescription } from "./services/sceneGeneratorService";
+import { generateVideo } from "./services/videoGeneratorService";
 
 interface Segment {
     description: string;
