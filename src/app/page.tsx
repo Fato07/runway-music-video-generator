@@ -119,7 +119,8 @@ export default function Home() {
                 duration: Math.min(4, Math.max(2, 60 / results.tempo * 4)), // 4 beats, max 4 seconds
                 transitionStyle: moodPatterns.dominantMood === 'energetic' 
                     ? 'quick dissolves and dynamic transitions'
-                    : 'smooth, gradual transitions'
+                    : 'smooth, gradual transitions',
+                analysisFileName: fileName // Add the required property
             };
 
             const videoPath = await generateVideo(
