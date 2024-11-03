@@ -4,8 +4,8 @@ import { logResults } from '@/app/services/loggingService';
 export async function POST(request: Request) {
     try {
         const data = await request.json();
-        await logResults(data);
-        return NextResponse.json({ success: true });
+        const analysisDir = await logResults(data);
+        return NextResponse.json({ success: true, analysisDir });
     } catch (error) {
         console.error('Error in log-results API route:', error);
         return NextResponse.json(

@@ -84,6 +84,7 @@ export async function logResults(log: AnalysisLog): Promise<void> {
         }
 
         console.log(`Results saved to: ${analysisDir}`);
+        return `${timestamp}_${log.audioFileName}`;
     } catch (error) {
         console.error('Error logging results:', error);
         throw error;
