@@ -48,16 +48,26 @@ function determineOptimalDuration(tempo: number, beats: number[]): 5 | 10 {
 }
 
 async function validateImageForRunway(imageUrl: string): Promise<void> {
-    const response = await fetch(imageUrl);
-    const contentType = response.headers.get('content-type');
-    
-    if (!contentType?.startsWith('image/')) {
-        throw new Error('Invalid image format. Must be JPEG, PNG, or WebP.');
-    }
+    try {
+        const proxyUrl = `/api/proxy-image?url=${encodeURIComponent(imageUrl)}`;
+        const response = await fetch(proxyUrl);
+        
+        if (!response.ok) {
+            throw new Error('Failed to validate image');
+        }
 
-    const contentLength = Number(response.headers.get('content-length'));
-    if (contentLength > 16 * 1024 * 1024) {
-        throw new Error('Image too large. Must be under 16MB.');
+        const contentType = response.headers.get('content-type');
+        if (!contentType?.startsWith('image/')) {
+            throw new Error('Invalid image format. Must be JPEG, PNG, or WebP.');
+        }
+
+        const contentLength = Number(response.headers.get('content-length'));
+        if (contentLength > 16 * 1024 * 1024) {
+            throw new Error('Image too large. Must be under 16MB.');
+        }
+    } catch (error) {
+        console.error('Image validation error:', error);
+        throw new Error('Failed to validate image: ' + (error instanceof Error ? error.message : 'Unknown error'));
     }
 }
 
