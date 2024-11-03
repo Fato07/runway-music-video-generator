@@ -151,7 +151,7 @@ export default function Home() {
 
             const videoPath = await generateVideo(
                 imageUrl,
-                variations || [],
+                // variations || [],
                 results.beats,
                 videoParams
             );
