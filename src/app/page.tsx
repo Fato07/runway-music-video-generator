@@ -59,7 +59,11 @@ export default function Home() {
     const [error, setError] = useState<string | null>(null);
     const [currentStep, setCurrentStep] = useState<string>('waiting'); // 'waiting' | 'analyzing' | 'generating-description' | 'generating-image'
     const [videoUrl, setVideoUrl] = useState<string | null>(null);
-    const [isGeneratingVideo, setIsGeneratingVideo] = useState(false);
+    const [videoGenStatus, setVideoGenStatus] = useState<{
+        status: 'idle' | 'validating' | 'generating' | 'processing' | 'downloading' | 'complete' | 'error';
+        message: string;
+        progress?: number;
+    }>({ status: 'idle', message: '' });
 
     const handleAnalysisComplete = async (results: AnalysisResults, fileName: string) => {
         setAnalysisResults(results);
@@ -104,10 +108,32 @@ export default function Home() {
             setImageVariations(variations || null);
             
             setCurrentStep('generating-video');
-            setIsGeneratingVideo(true);
-            
-            // Calculate appropriate motion intensity based on mood and tempo
-            // Determine video generation parameters based on analysis
+            setVideoGenStatus({ 
+                status: 'generating', 
+                message: 'Initializing video generation...' 
+            });
+
+            // Set up event listeners for video generation progress
+            videoGenerationEvents.on('progress', (data: { 
+                status: 'validating' | 'generating' | 'processing' | 'downloading' | 'complete';
+                message: string;
+                progress?: number;
+            }) => {
+                setVideoGenStatus({
+                    status: data.status,
+                    message: data.message,
+                    progress: data.progress
+                });
+            });
+
+            videoGenerationEvents.on('error', (data: { message: string }) => {
+                setVideoGenStatus({
+                    status: 'error',
+                    message: data.message
+                });
+                setError(data.message);
+            });
+
             const videoParams = {
                 mood: moodPatterns.dominantMood,
                 tempo: results.tempo,
@@ -132,7 +158,15 @@ export default function Home() {
             
             setVideoUrl(videoPath);
             setCurrentStep('complete');
-            setIsGeneratingVideo(false);
+            setVideoGenStatus({ 
+                status: 'complete', 
+                message: 'Video generation completed successfully',
+                progress: 100
+            });
+
+            // Clean up event listeners
+            videoGenerationEvents.removeAllListeners('progress');
+            videoGenerationEvents.removeAllListeners('error');
 
             // Log the results with the original filename through the API
             const logResponse = await fetch('/api/log-results', {
@@ -158,8 +192,15 @@ export default function Home() {
             setError(err instanceof Error ? err.message : 'Failed to generate scene and image');
             console.error('Generation error:', err);
             setCurrentStep('error');
+            setVideoGenStatus({ 
+                status: 'error', 
+                message: err instanceof Error ? err.message : 'Failed to generate video'
+            });
         } finally {
             setIsGenerating(false);
+            // Clean up event listeners in case of error
+            videoGenerationEvents.removeAllListeners('progress');
+            videoGenerationEvents.removeAllListeners('error');
         }
     };
     return (
@@ -250,14 +291,33 @@ export default function Home() {
                     </div>
                 )}
 
-                {isGeneratingVideo && (
+                {videoGenStatus.status !== 'idle' && videoGenStatus.status !== 'complete' && (
                     <div className="mt-8 max-w-2xl mx-auto">
+                        <div className="mb-4">
+                            <div className="flex items-center justify-between mb-1">
+                                <span className="text-sm font-medium text-gray-700 capitalize">
+                                    {videoGenStatus.status}
+                                </span>
+                                {videoGenStatus.progress && (
+                                    <span className="text-sm font-medium text-gray-700">
+                                        {videoGenStatus.progress}%
+                                    </span>
+                                )}
+                            </div>
+                            {videoGenStatus.progress && (
+                                <div className="w-full bg-gray-200 rounded-full h-2.5">
+                                    <div 
+                                        className="bg-blue-600 h-2.5 rounded-full transition-all duration-300" 
+                                        style={{ width: `${videoGenStatus.progress}%` }}
+                                    ></div>
+                                </div>
+                            )}
+                        </div>
                         <div className="animate-pulse space-y-4">
-                            <div className="h-4 bg-gray-200 rounded"></div>
                             <div className="h-64 bg-gray-200 rounded"></div>
                         </div>
                         <p className="mt-4 text-gray-600">
-                            Generating video from scenes...
+                            {videoGenStatus.message}
                         </p>
                     </div>
                 )}
