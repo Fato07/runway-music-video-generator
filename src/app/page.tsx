@@ -155,12 +155,13 @@ export default function Home() {
                 style // Pass the style option
             };
 
-            const videoPath = await generateVideo(
+            const videoUrl = await generateVideo(
                 imageUrl,
                 results.beats,
                 videoParams
             );
             
+            const videoPath = await downloadFile(videoUrl, `${fileName}.mp4`, fileName);
             setVideoUrl(videoPath);
             setCurrentStep('complete');
             setVideoGenStatus({ 

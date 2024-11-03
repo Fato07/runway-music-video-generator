@@ -18,6 +18,7 @@ export async function POST(request: NextRequest) {
         await fs.mkdir(resultsDir, { recursive: true });
 
         const filePath = path.join(resultsDir, filename);
+        console.log(`Downloading video from URL: ${url}`);
         const response = await fetch(url);
         
         if (!response.ok) {
@@ -25,6 +26,7 @@ export async function POST(request: NextRequest) {
         }
         const buffer = await response.arrayBuffer();
         await fs.writeFile(filePath, Buffer.from(buffer));
+        console.log(`Video saved to: ${filePath}`);
 
         // Return the relative path
         const relativePath = `/results/${analysisId}/${filename}`;
