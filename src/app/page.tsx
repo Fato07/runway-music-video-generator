@@ -165,6 +165,7 @@ export default function Home() {
             setVideoUrl(videoUrl);
 
             // Optionally download the video for reference
+            const analysisDir = ''; // Define analysisDir appropriately
             await downloadFile(videoUrl, `${fileName}.mp4`, analysisDir);
             setCurrentStep('complete');
             setVideoGenStatus({ 
