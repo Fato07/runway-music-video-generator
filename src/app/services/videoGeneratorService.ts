@@ -6,6 +6,7 @@ import { EventEmitter } from 'events';
 export const videoGenerationEvents = new EventEmitter();
 
 interface VideoGenerationOptions {
+    style: string;
     mood: string;
     tempo: number;
     transitionStyle?: string;

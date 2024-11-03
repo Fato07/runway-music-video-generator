@@ -1,42 +1,76 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Runway Music Video Generator
 
+Transform audio tracks into stunning AI-generated visual experiences. This application analyzes music to create synchronized, mood-driven visual scenes using advanced AI technology.
 
-docs:
-- https://platform.openai.com/docs/api-reference/images/create
-- https://github.com/runwayml/sdk-node/blob/main/src/resources/tasks.ts
-- https://platform.openai.com/docs/guides/images/usage?lang=node.js
-- https://docs.dev.runwayml.com/guides/quickstart/
-## Getting Started
+## Core Features
 
-First, run the development server:
+### Audio Analysis
+- Precise beat detection and tempo analysis
+- Intelligent mood recognition
+- Dynamic segment identification with timestamps
+- Seamless audio file upload via drag-and-drop
 
+### Visual Generation
+- DALL-E 3 powered scene generation
+- Mood-adaptive visual theming
+- Dynamic transitions based on audio segments
+- Artistic styles:
+  - Surreal: dreamlike, abstract forms
+  - Real-world: life-like, grounded compositions
+- Resolution options:
+  - Landscape: 1792x1024
+  - Square: 1024x1024
+  - Portrait: 1024x1792
+- Quality settings: Standard/HD
+
+## Quick Start
+
+1. Install dependencies:
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+npm install
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+2. Configure environment:
+Create `.env.local` with required API keys:
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+OPENAI_API_KEY=your_openai_api_key
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+3. Launch development server:
+```npm run dev```
 
-## Learn More
+Access the application at http://localhost:3000
 
-To learn more about Next.js, take a look at the following resources:
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Development Stack
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+- Next.js 14
+- TypeScript
+- OpenAI DALL-E 3 API
+- Web Audio API
 
-## Deploy on Vercel
+## Key Components
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+- `AudioUpload`: Handles audio file processing and analysis
+- `audioAnalysisService`: Extracts beats, tempo, mood, and segments
+- `imageGeneratorService`: Creates AI-generated scenes with mood-based prompts
+- `sceneGeneratorService`: Coordinates scene generation based on audio analysis
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## API Integration
+
+The application leverages OpenAI's DALL-E 3 for image generation with:
+- Enhanced prompt engineering
+- Mood-based visual styling
+- Tempo-synchronized scene generation
+- Quality and resolution controls
+
+## Contributing
+
+We welcome contributions! Feel free to:
+1. Fork the repository
+2. Create a feature branch
+3. Submit a pull request
+
+## License
+
+MIT License - Feel free to use this project commercially or personally.
+
